@@ -77,6 +77,7 @@ namespace EmployeeManagement.Controllers
         [HttpPost]
         public async Task<ActionResult<Employee>> PostEmployee(Employee employee)
         {
+            employee.Id = Guid.NewGuid();
             _context.Employees.Add(employee);
             try
             {
