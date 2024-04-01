@@ -19,3 +19,14 @@ public partial class Employee
 
     public long? Experience { get; set; }
 }
+
+public partial class EmployeeDTO
+{
+    public string? Name { get; set; }
+
+    public string? Department { get; set; }
+
+    public DateOnly? BirthDate { get; set; }
+
+    public long? Experience { get; set; }
+}

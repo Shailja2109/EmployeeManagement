@@ -44,9 +44,11 @@ namespace EmployeeManagement.Controllers
         // PUT: api/Employees/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutEmployee(Guid id, Employee employee)
+        public async Task<IActionResult> PutEmployee(Guid id, EmployeeDTO employee)
         {
-            if (id != employee.Id)
+            var employeePresent = await _context.Employees.FindAsync(id);
+
+            if (id != employeePresent.Id)
             {
                 return BadRequest();
             }
@@ -59,7 +61,7 @@ namespace EmployeeManagement.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!EmployeeExists(id))
+                if (!EmployeeExists(employee.Name))
                 {
                     return NotFound();
                 }
@@ -75,17 +77,24 @@ namespace EmployeeManagement.Controllers
         // POST: api/Employees
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Employee>> PostEmployee(Employee employee)
+        public async Task<ActionResult<Employee>> PostEmployee(EmployeeDTO employee)
         {
-            employee.Id = Guid.NewGuid();
-            _context.Employees.Add(employee);
+            var EmpID = Guid.NewGuid();
+            _context.Employees.Add(new Employee()
+            {
+                Id = EmpID,
+                Name = employee.Name,
+                BirthDate = employee.BirthDate,
+                Department = employee.Department,
+                Experience = employee.Experience
+            });
             try
             {
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateException)
             {
-                if (EmployeeExists(employee.Id))
+                if (EmployeeExists(employee.Name))
                 {
                     return Conflict();
                 }
@@ -95,7 +104,7 @@ namespace EmployeeManagement.Controllers
                 }
             }
 
-            return CreatedAtAction("GetEmployee", new { id = employee.Id }, employee);
+            return CreatedAtAction("GetEmployee", new { id = EmpID}, employee);
         }
 
         // DELETE: api/Employees/5
@@ -114,9 +123,9 @@ namespace EmployeeManagement.Controllers
             return NoContent();
         }
 
-        private bool EmployeeExists(Guid id)
+        private bool EmployeeExists(string name)
         {
-            return _context.Employees.Any(e => e.Id == id);
+            return _context.Employees.Any(e => e.Name == name);
         }
     }
 }
