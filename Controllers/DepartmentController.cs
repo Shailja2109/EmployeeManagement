@@ -1,60 +1,54 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using EmployeeManagement.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using EmployeeManagement;
-using EmployeeManagement.Models;
+
+// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace EmployeeManagement.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class EmployeesController : ControllerBase
+    public class DepartmentController : ControllerBase
     {
         private readonly EmployeeManagementContext _context;
 
-        public EmployeesController(EmployeeManagementContext context)
+        public DepartmentController(EmployeeManagementContext context)
         {
             _context = context;
         }
 
         // GET: api/Employees
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Employee>>> GetEmployees()
+        public async Task<ActionResult<IEnumerable<Department>>> GetDepartment()
         {
-            return await _context.Employees.ToListAsync();
+            return await _context.Departments.ToListAsync();
         }
 
         // GET: api/Employees/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Employee>> GetEmployee(Guid id)
+        public async Task<ActionResult<Department>> GetDepartment(Guid id)
         {
-            var employee = await _context.Employees.FindAsync(id);
+            var department = await _context.Departments.FindAsync(id);
 
-            if (employee == null)
+            if (department == null)
             {
                 return NotFound();
             }
 
-            return employee;
+            return department;
         }
 
         // PUT: api/Employees/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutEmployee(Guid id, EmployeeDTO employee)
+        public async Task<IActionResult> PutDepartment(Guid id, string name)
         {
-            var employeePresent = await _context.Employees.FindAsync(id);
+            var departmentPresent = await _context.Departments.FindAsync(id);
 
-            if (id != employeePresent.Id)
+            if (id != departmentPresent.Id)
             {
                 return BadRequest();
             }
-
-            _context.Entry(employeePresent).State = EntityState.Modified;
 
             try
             {
@@ -62,7 +56,7 @@ namespace EmployeeManagement.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!EmployeeExists(employee.Name))
+                if (!DepartmentExists(name))
                 {
                     return NotFound();
                 }
@@ -78,16 +72,13 @@ namespace EmployeeManagement.Controllers
         // POST: api/Employees
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Employee>> PostEmployee(EmployeeDTO employee)
+        public async Task<ActionResult<Employee>> PostDepartment(string name)
         {
-            var EmpID = Guid.NewGuid();
-            _context.Employees.Add(new Employee()
+            var DeptID = Guid.NewGuid();
+            _context.Departments.Add(new Department()
             {
-                Id = EmpID,
-                Name = employee.Name,
-                BirthDate = employee.BirthDate,
-                Department = employee.Department,
-                Experience = employee.Experience
+                Id = DeptID,
+                Name = name
             });
             try
             {
@@ -95,7 +86,7 @@ namespace EmployeeManagement.Controllers
             }
             catch (DbUpdateException)
             {
-                if (EmployeeExists(employee.Name))
+                if (DepartmentExists(name))
                 {
                     return Conflict();
                 }
@@ -105,28 +96,28 @@ namespace EmployeeManagement.Controllers
                 }
             }
 
-            return CreatedAtAction("GetEmployee", new { id = EmpID}, employee);
+            return CreatedAtAction("GetDepartment", new { id = DeptID}, name);
         }
 
         // DELETE: api/Employees/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteEmployee(Guid id)
+        public async Task<IActionResult> DeleteDepartmnet(Guid id)
         {
-            var employee = await _context.Employees.FindAsync(id);
-            if (employee == null)
+            var department = await _context.Departments.FindAsync(id);
+            if (department == null)
             {
                 return NotFound();
             }
 
-            _context.Employees.Remove(employee);
+            _context.Departments.Remove(department);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool EmployeeExists(string name)
+        private bool DepartmentExists(string name)
         {
-            return _context.Employees.Any(e => e.Name == name);
+            return _context.Departments.Any(e => e.Name == name);
         }
     }
 }

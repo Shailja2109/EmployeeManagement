@@ -1,4 +1,5 @@
 using EmployeeManagement.Controllers;
+using EmployeeManagement.Models;
 
 namespace EmployeeManagement
 {
